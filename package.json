@@ -1,0 +1,41 @@
+{
+  "name": "loopback-changes-history-mixin",
+  "version": "0.0.1",
+  "description": "Loopback mixin to register all changes in a record model.",
+  "main": "index.js",
+  "scripts": {
+    "vpublish": "npm version patch -m \"Version %s\" && npm publish",
+    "test": "mocha --reporter spec",
+    "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
+  },
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arondn2/loopback-changes-history-mixin.git"
+  },
+  "keywords": [
+    "nodejs",
+    "template",
+    "modules"
+  ],
+  "author": "Alex J. Rondon <arondn2@gmail.com> (https://github.com/arondn2)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arondn2/loopback-changes-history-mixin/issues"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "coveralls": "^3.0.2",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "examples",
+    "tests"
+  ],
+  "dependencies": {}
+}
