@@ -1,1 +1,1 @@
-module.exports = require('./lib/loopback-changes-history-mixin1');
+module.exports = require('./lib/loopback-changes-history-mixin');
