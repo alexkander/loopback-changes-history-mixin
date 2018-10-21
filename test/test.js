@@ -6,15 +6,14 @@ const should     = require('chai').should();
 const loopback   = require('loopback');
 const Promise    = require('bluebird');
 
-// metodos que faltan probar
-// destroyAll
-// destroyById
-// replaceById
-// replaceOrCreate
-// upsert
-// upsertWithWhere
-// prototype.destroy
-// prototype.replaceAtributes
+// Metodos sin testear
+  // destroyAll
+  // destroyById
+  // prototype.destroy
+  // replaceById
+  // prototype.replaceAtributes
+  // replaceOrCreate
+  // upsertWithWhere
 
 const ChangesHistoryMixin = require('../changes-history');
 
