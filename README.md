@@ -48,8 +48,6 @@ Add mixin params in model definition. Example:
 }
 ```
 
-## Usage
-
 In the above definition it will define the following:
 - A model called `Person_history` with properties indicated in `fields`: `name`, `email`, `status` and `description`.
 - Relation `Person` has many `history` (model `Person_history`, foreign key `_recordId`).
@@ -61,7 +59,7 @@ Every time a change is made in a record of `Person`, it will be saved in `Person
 and the following fields:
 - `_version = <version code>`
 - `_hash    = <hash code>`
-- `_action  = <'created' or 'updated'>`
+- `_action  = <'create' or 'update' or 'delete'>`
 - `_update  = <date of change>`
 
 ## Options
@@ -70,46 +68,54 @@ The mixin supports the following parameters:
 
  Name                 | Type                    | Default                | Optional | Description
 ----------------------|-------------------------|------------------------|----------|------------
- `fields`             | `array` or `string` `*` | `*`                    | No       | Array with the fields to version.
+ `fields`             | `array` or `string` `*` | `*`                    | No       | Array with the fields to version
  `modelName`          | `string`                | `${ModelName}_history` | No       | Name to history model
- `relationName`       | `string`                | `history`              | No       | Model has many history model relation name.
- `relationParentName` | `string`                | `_record`              | No       | History model belongs to model relation name.
- `relationForeignKey` | `string`                | `_recordId`            | No       | Foreign key for relations.
- `versionFieldName`   | `string`                | `_version`             | No       | Field name to version code.
- `hashFieldName`      | `string`                | `_hash`                | Yes      | Field name to hash code.
- `actionFieldName`    | `string`                | `_action`              | Yes      | Field name to action name.
- `updatedFieldName`   | `string`                | `_update`              | Yes      | Field name to update date.
-
-###
+ `relationName`       | `string`                | `history`              | No       | Model has many history model relation name
+ `relationParentName` | `string`                | `_record`              | No       | History model belongs to model relation name
+ `relationForeignKey` | `string`                | `_recordId`            | No       | Foreign key for relations
+ `versionFieldName`   | `string`                | `_version`             | No       | Field name to version code
+ `versionFieldLen`    | `number`                | 5                      | No       | Length to `versionField`
+ `hashFieldName`      | `string`                | `_hash`                | Yes      | Field name to hash code
+ `hashFieldLen`       | `number`                | 10                     | `hashFieldName`===false | Length to `hashField`
+ `actionFieldName`    | `string`                | `_action`              | Yes      | Field name to action name
+ `updatedFieldName`   | `string`                | `_update`              | Yes      | Field name to update date
 
 ## Loopback methods
 
-Create
+Generates create records
   - `Model.create`
   - `Model.updateOrCreate` (AKA `Model.upsert`)
   - `Model.findOrCreate`
   - `Model.replaceOrCreate`
-  - `Model.upsertWithWhere`
+  - `Model.upsertWithWhere` (vew)
 
-Update
+Generates update records
   - `Model.updateOrCreate` (AKA `Model.upsert`)
   - `Model.replaceOrCreate`
-  - `Model.upsertWithWhere`
+  - `Model.upsertWithWhere` (vew)
   - `Model.replaceById`
   - `Model.prototype.save`
   - `Model.prototype.updateAttribute`
   - `Model.prototype.updateAttributes`
   - `Model.prototype.replaceAtributes`
 
-Delete
-  - `Model.deleteAll` (AKA `Model.destroyAll`)
+Generates destroy records
+  - `Model.prototype.delete` (AKA `Model.prototype.destroy`)
   - `Model.deleteById` (AKA `Model.destroyById`)
-  - `Model.prototype.delete` (AKA `Model.destroy`)
 
-Unsupported
+Unsupported methods
   - `Model.updateAll`
+  - `Model.deleteAll` (AKA `Model.destroyAll`)
 
-### Troubles
+### Model.upsertWithWhere
+To create history change with method `upsertWithWhere` option `instanceByWhere: true` must be passed:
+```js
+const where = { /* ... */};
+const data = { /* ... */ };
+Person.upsertWithWhere(where, data, { instanceByWhere: true });
+```
+
+## Troubles
 
 If you have any kind of trouble with it, just let me now by raising an issue on the GitHub issue tracker here:
 

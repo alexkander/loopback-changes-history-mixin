@@ -290,11 +290,21 @@ describe('#loopback-allowed-properties-mixin', () => {
   [ {
     name: 'with default params',
     params: {},
-  // }, {
-  //   name: 'without default params',
-  //   params: {
-  //     hashFieldName: false
-  //   },
+  }, {
+    name: 'without hashFieldName param',
+    params: {
+      hashFieldName: false
+    },
+  }, {
+    name: 'without actionFieldName param',
+    params: {
+      actionFieldName: false
+    },
+  }, {
+    name: 'without updatedFieldName param',
+    params: {
+      updatedFieldName: false
+    },
   }, ]
   .map((section) => {
 
@@ -352,11 +362,17 @@ describe('#loopback-allowed-properties-mixin', () => {
             .then((record) => {
               // Properties
               expect(record).to.have.property('_version');
-              expect(record).to.have.property('_hash');
+              if (section.params.hashFieldName !== false) {
+                expect(record).to.have.property('_hash');
+              } else {
+                expect(record).to.have.not.property('_hash');
+              }
               // Tipos
               expect(record._version).to.be.a('string');
-              expect(record._hash).to.be.a('string');
-              expect(record._hash.length).to.equal(ChangesHistoryMixin.DEFAULT_OPTS.hashFieldLen);
+              if (section.params.hashFieldName !== false) {
+                expect(record._hash).to.be.a('string');
+                expect(record._hash.length).to.equal(ChangesHistoryMixin.DEFAULT_OPTS.hashFieldLen);
+              }
 
               expect(record._version).to.equal(V1);
 
@@ -370,26 +386,48 @@ describe('#loopback-allowed-properties-mixin', () => {
                 // Properties
                 expect(change).to.have.property('_version');
                 expect(change).to.have.property('id');
-                expect(change).to.have.property('_hash');
-                expect(change).to.have.property('_action');
-                expect(change).to.have.property('_update');
+                if (section.params.hashFieldName !== false) {
+                  expect(change).to.have.property('_hash');
+                } else {
+                  expect(change).to.have.not.property('_hash');
+                }
+                if (section.params.actionFieldName !== false) {
+                  expect(change).to.have.property('_action');
+                } else {
+                  expect(change).to.have.not.property('_action');
+                }
+                if (section.params.updatedFieldName !== false) {
+                  expect(change).to.have.property('_update');
+                } else {
+                  expect(change).to.have.not.property('_update');
+                }
                 expect(change).to.have.property('price');
                 expect(change).to.have.property('amount');
                 expect(change).to.have.property('description');
                 // Properties types
                 expect(change.id).to.be.a('number');
                 expect(change._version).to.be.a('string');
-                expect(change._hash).to.be.a('string');
-                expect(change._action).to.be.a('string');
-                expect(change._update).to.be.a('date');
+                if (section.params.hashFieldName !== false) {
+                  expect(change._hash).to.be.a('string');
+                }
+                if (section.params.actionFieldName !== false) {
+                  expect(change._action).to.be.a('string');
+                }
+                if (section.params.updatedFieldName !== false) {
+                  expect(change._update).to.be.a('date');
+                }
                 expect(change.price).to.be.a('number');
                 expect(change.amount).to.be.a('number');
                 expect(change.description).to.be.a('string');
                 // Values
                 expect(change.id).to.equal(record.id);
                 expect(change._version).to.equal(record._version);
-                expect(change._hash).to.equal(record._hash);
-                expect(change._action).to.equal('create');
+                if (section.params.hashFieldName !== false) {
+                  expect(change._hash).to.equal(record._hash);
+                }
+                if (section.params.actionFieldName !== false) {
+                  expect(change._action).to.equal('create');
+                }
                 expect(change.price).to.equal(record.price);
                 expect(change.amount).to.equal(record.amount);
                 expect(change.description).to.equal(record.description);
@@ -494,7 +532,9 @@ describe('#loopback-allowed-properties-mixin', () => {
 
                   const [change1, change2] = changes;
 
-                  expect(newRecord._hash).to.not.equal(prevHash);
+                  if (section.params.hashFieldName !== false) {
+                    expect(newRecord._hash).to.not.equal(prevHash);
+                  }
                   expect(newRecord._version).to.not.equal(prevVersion);
                   expect(newRecord._version).to.equal(V2);
 
@@ -502,8 +542,12 @@ describe('#loopback-allowed-properties-mixin', () => {
                   expect(change2.amount).to.equal(newRecord.amount);
                   expect(change2.description).to.equal(newRecord.description);
                   expect(change2._version).to.equal(V2);
-                  expect(change2._hash).to.equal(newRecord._hash);
-                  expect(change2._action).to.equal('update');
+                  if (section.params.hashFieldName !== false) {
+                    expect(change2._hash).to.equal(newRecord._hash);
+                  }
+                  if (section.params.actionFieldName !== false) {
+                    expect(change2._action).to.equal('update');
+                  }
                   expect(change2._recordId).to.equal(newRecord.id);
 
                 })
@@ -581,7 +625,9 @@ describe('#loopback-allowed-properties-mixin', () => {
                 expect(changes.length).to.equal(2);
                 const [change1, change2] = changes;
                 expect(change2._version).to.equal(V2);
-                expect(change2._action).to.equal('delete');
+                if (section.params.actionFieldName !== false) {
+                  expect(change2._action).to.equal('delete');
+                }
               })
             })
 
