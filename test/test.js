@@ -1,10 +1,10 @@
 'use strict';
 
-const assert     = require('assert');
-const expect     = require('chai').expect;
-const should     = require('chai').should();
-const loopback   = require('loopback');
-const Promise    = require('bluebird');
+const assert   = require('assert');
+const expect   = require('chai').expect;
+const should   = require('chai').should();
+const loopback = require('loopback');
+const Promise  = require('bluebird');
 
 const ChangesHistoryMixin = require('../changes-history');
 
@@ -292,6 +292,7 @@ describe('#loopback-allowed-properties-mixin', () => {
     params: {},
   }, {
     name: 'without hashFieldName param',
+    skipNoGenerateChanges: true,
     params: {
       hashFieldName: false
     },
@@ -441,73 +442,75 @@ describe('#loopback-allowed-properties-mixin', () => {
 
       });
 
+
+      const updateActions = [
+        {
+          name: 'Model.updateOrCreate',
+          callback: (app, data, record) => app.models.Product.updateOrCreate({
+            id: record.id,
+            price: data.price + 50,
+          }),
+        }, {
+          name: 'Model.replaceOrCreate',
+          callback: (app, data, record) => {
+            const newData = record.toJSON();
+            newData.price += 50;
+            return app.models.Product.replaceOrCreate(newData);
+          },
+        }, {
+          name: 'Model.upsertWithWhere',
+          callback: (app, data, record) => {
+            const newData = record.toJSON();
+            newData.price += 50;
+            delete newData.id;
+            return app.models.Product.upsertWithWhere({
+              id: record.id,
+            }, newData, {
+              instanceByWhere: true,
+            });
+          }
+        }, {
+          name: 'Model.replaceById',
+          callback: (app, data, record) => {
+            const newData = record.toJSON();
+            newData.price += 50;
+            delete newData.id;
+            return app.models.Product.replaceById(record.id, newData);
+          }
+        }, {
+          name: 'Model.prototype.save',
+          callback: (app, data, record) => {
+            record.price += 50;
+            return record.save();
+          }
+        }, {
+          name: 'Model.prototype.updateAttribute',
+          callback: (app, data, record) => {
+            return record.updateAttribute('price', record.price+50);
+          }
+        }, {
+          name: 'Model.prototype.updateAttributes',
+          callback: (app, data, record) => {
+            return record.updateAttributes({
+              'price': record.price+50
+            });
+          }
+        }, {
+          name: 'Model.prototype.replaceAttributes',
+          callback: (app, data, record) => {
+            const newData = record.toJSON();
+            newData.price += 50;
+            delete newData.id;
+            return record.replaceAttributes(newData);
+          }
+        }
+      ];
+
       describe('updating records', () => {
 
         const V2 = ChangesHistoryMixin.getVersion(ChangesHistoryMixin.DEFAULT_OPTS.versionFieldLen, 2);
 
-        [
-          {
-            name: 'Model.updateOrCreate',
-            callback: (app, data, record) => app.models.Product.updateOrCreate({
-              id: record.id,
-              price: data.price + 50,
-            }),
-          }, {
-            name: 'Model.replaceOrCreate',
-            callback: (app, data, record) => {
-              const newData = record.toJSON();
-              newData.price += 50;
-              return app.models.Product.replaceOrCreate(newData);
-            },
-          }, {
-            name: 'Model.upsertWithWhere',
-            callback: (app, data, record) => {
-              const newData = record.toJSON();
-              newData.price += 50;
-              delete newData.id;
-              return app.models.Product.upsertWithWhere({
-                id: record.id,
-              }, newData, {
-                instanceByWhere: true,
-              });
-            }
-          }, {
-            name: 'Model.replaceById',
-            callback: (app, data, record) => {
-              const newData = record.toJSON();
-              newData.price += 50;
-              delete newData.id;
-              return app.models.Product.replaceById(record.id, newData);
-            }
-          }, {
-            name: 'Model.prototype.save',
-            callback: (app, data, record) => {
-              record.price += 50;
-              return record.save();
-            }
-          }, {
-            name: 'Model.prototype.updateAttribute',
-            callback: (app, data, record) => {
-              return record.updateAttribute('price', record.price+50);
-            }
-          }, {
-            name: 'Model.prototype.updateAttributes',
-            callback: (app, data, record) => {
-              return record.updateAttributes({
-                'price': record.price+50
-              });
-            }
-          }, {
-            name: 'Model.prototype.replaceAttributes',
-            callback: (app, data, record) => {
-              const newData = record.toJSON();
-              newData.price += 50;
-              delete newData.id;
-              return record.replaceAttributes(newData);
-            }
-          }
-        ]
-        .map((action) => {
+        updateActions.map((action) => {
 
           it(action.name, p(() => {
 
@@ -558,33 +561,80 @@ describe('#loopback-allowed-properties-mixin', () => {
 
         });
 
-        it('Model.updatingAll (no generate changes)', p(() => {
+      });
 
-          const app = getAppSection();
+      if (!section.skipNoGenerateChanges) {
+        describe('updating records no generate changes', () => {
 
-          return app.models.Product.create({ price: 100, })
-          .then(() => {
-            return app.models.Product.create({ price: 200, });
-          })
-          .then(() => {
-            return app.models.Product_history.count({})
-            .then((count) => {
-              expect(count).to.equal(2);
-            })
+          const V1 = ChangesHistoryMixin.getVersion(ChangesHistoryMixin.DEFAULT_OPTS.versionFieldLen, 1);
+
+          updateActions.map((action) => {
+
+            it(action.name, p(() => {
+
+              const opts = Object.assign({}, section.params);
+              opts.fields = ['amount'];
+              const app = getApp(opts);
+
+              const data = {
+                price: 100,
+                amount: 10,
+                description: 'product description',
+              };
+
+              return app.models.Product.create(data)
+              .then((record) => {
+                const prevHash = record._hash;
+                const prevVersion = record._version;
+                return action.callback(app, data, record)
+                .then((newRecord) => {
+                  return newRecord.history.find({})
+                  .then((changes) => {
+
+                    expect(changes.length).to.equal(1);
+
+                    if (section.params.hashFieldName !== false) {
+                      expect(newRecord._hash).to.equal(prevHash);
+                    }
+                    expect(newRecord._version).to.equal(prevVersion);
+                    expect(newRecord._version).to.equal(V1);
+
+                  })
+                })
+              });
+
+            }));
+
+          });
+
+          it('Model.updatingAll ()', p(() => {
+
+            const app = getAppSection();
+
+            return app.models.Product.create({ price: 100, })
             .then(() => {
-              return app.models.Product.updateAll({}, { amount: 0 });
+              return app.models.Product.create({ price: 200, });
             })
             .then(() => {
               return app.models.Product_history.count({})
-            })
-            .then((count) => {
-              expect(count).to.equal(2);
+              .then((count) => {
+                expect(count).to.equal(2);
+              })
+              .then(() => {
+                return app.models.Product.updateAll({}, { amount: 0 });
+              })
+              .then(() => {
+                return app.models.Product_history.count({})
+              })
+              .then((count) => {
+                expect(count).to.equal(2);
+              });
             });
-          });
 
-        }));
+          }));
 
-      });
+        });
+      }
 
       describe('deleting records', () => {
 

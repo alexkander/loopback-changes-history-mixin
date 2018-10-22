@@ -75,10 +75,14 @@ The mixin supports the following parameters:
  `relationForeignKey` | `string`                | `_recordId`            | No       | Foreign key for relations
  `versionFieldName`   | `string`                | `_version`             | No       | Field name to version code
  `versionFieldLen`    | `number`                | 5                      | No       | Length to `versionField`
- `hashFieldName`      | `string`                | `_hash`                | Yes      | Field name to hash code
- `hashFieldLen`       | `number`                | 10                     | `hashFieldName`===false | Length to `hashField`
- `actionFieldName`    | `string`                | `_action`              | Yes      | Field name to action name
- `updatedFieldName`   | `string`                | `_update`              | Yes      | Field name to update date
+ `hashFieldName`      | `string` or `false`     | `_hash`                | Yes      | Field name to hash code
+ `hashFieldLen`       | `number`                | 10                     | No       | Length to `hashField`
+ `actionFieldName`    | `string` or `false`     | `_action`              | Yes      | Field name to action name
+ `updatedFieldName`   | `string` or `false`     | `_update`              | Yes      | Field name to update date
+
+Notes:
+- `hashFieldName` allow create a history change only if any property in fields was alter. If setup `hashFieldName: false` then a history change will be creates with update method called.
+- If `hashFieldName` is `false` then `hashFieldLen` is. ignoored.
 
 ## Loopback methods
 
@@ -87,12 +91,12 @@ Generates create records
   - `Model.updateOrCreate` (AKA `Model.upsert`)
   - `Model.findOrCreate`
   - `Model.replaceOrCreate`
-  - `Model.upsertWithWhere` (vew)
+  - `Model.upsertWithWhere` (view `Model.upsertWithWhere` section below)
 
 Generates update records
   - `Model.updateOrCreate` (AKA `Model.upsert`)
   - `Model.replaceOrCreate`
-  - `Model.upsertWithWhere` (vew)
+  - `Model.upsertWithWhere` (view `Model.upsertWithWhere` section below)
   - `Model.replaceById`
   - `Model.prototype.save`
   - `Model.prototype.updateAttribute`
