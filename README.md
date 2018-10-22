@@ -84,26 +84,30 @@ The mixin supports the following parameters:
 
 ## Loopback methods
 
-This mixin works with the following methods:
-
+Create
   - `Model.create`
-  - `Model.upsert`
+  - `Model.updateOrCreate` (AKA `Model.upsert`)
+  - `Model.findOrCreate`
+  - `Model.replaceOrCreate`
+  - `Model.upsertWithWhere`
+
+Update
+  - `Model.updateOrCreate` (AKA `Model.upsert`)
+  - `Model.replaceOrCreate`
+  - `Model.upsertWithWhere`
+  - `Model.replaceById`
   - `Model.prototype.save`
   - `Model.prototype.updateAttribute`
   - `Model.prototype.updateAttributes`
-
-Unsupported methods
-
-  - `Model.updateAll`
-  - `Model.destroyAll`
-
-Developing
-  - `Model.destroyById`
-  - `Model.prototype.destroy`
-  - `Model.replaceById`
   - `Model.prototype.replaceAtributes`
-  - `Model.replaceOrCreate`
-  - `Model.upsertWithWhere`
+
+Delete
+  - `Model.deleteAll` (AKA `Model.destroyAll`)
+  - `Model.deleteById` (AKA `Model.destroyById`)
+  - `Model.prototype.delete` (AKA `Model.destroy`)
+
+Unsupported
+  - `Model.updateAll`
 
 ### Troubles
 
