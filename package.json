@@ -1,6 +1,6 @@
 {
   "name": "loopback-changes-history-mixin",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Loopback mixin to register all changes in a record model.",
   "main": "index.js",
   "scripts": {
