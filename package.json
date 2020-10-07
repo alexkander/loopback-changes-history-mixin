@@ -4,8 +4,9 @@
   "description": "Loopback mixin to register all changes in a record model.",
   "main": "index.js",
   "scripts": {
+    "mocha": "node ./node_modules/mocha/bin/_mocha",
     "vpublish": "npm version patch -m \"Version %s\" && npm publish",
-    "test": "mocha --reporter spec",
+    "test": "npm run mocha --reporter test/*",
     "cover": "node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha -- -R spec test/*"
   },
   "engines": {

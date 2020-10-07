@@ -9,7 +9,7 @@ const Promise  = require('bluebird');
 const ChangesHistoryMixin = require('../changes-history');
 
 function getApp(opts) {
-  
+
   const app = loopback();
   const ds  = loopback.createDataSource({
     connector: 'memory',
@@ -22,6 +22,8 @@ function getApp(opts) {
     price:       'number',
     amount:      'number',
     description: 'string',
+  }, {
+    hidden: ['description']
   });
 
   app.model(Product);
@@ -163,7 +165,7 @@ describe('#loopback-allowed-properties-mixin', () => {
   describe('definitions validations', () => {
 
     it('default setup', () => {
-      
+
       const app = getApp({});
 
       // ------------------------------
@@ -173,7 +175,7 @@ describe('#loopback-allowed-properties-mixin', () => {
       expect(app.models.Product.relations).to.have.property('history');
       expect(app.models.Product.relations.history.type).to.equal('hasMany');
       expect(app.models.Product.relations.history.keyTo).to.equal('_recordId');
-      
+
       // Properties
       expect(app.models.Product.definition.properties).to.have.property('_version');
       expect(app.models.Product.definition.properties).to.have.property('_hash');
@@ -215,7 +217,7 @@ describe('#loopback-allowed-properties-mixin', () => {
 
       const VERSION_LEN = 4;
       const HASH_LEN = 8;
-      
+
       const app = getApp({
         fields:             ['price'],
         modelName:          'ProductChanges',
@@ -234,7 +236,7 @@ describe('#loopback-allowed-properties-mixin', () => {
       expect(app.models.Product.relations).to.have.property('customHistory');
       expect(app.models.Product.relations.customHistory.type).to.equal('hasMany');
       expect(app.models.Product.relations.customHistory.keyTo).to.equal('elementId');
-      
+
       // Properties
       expect(app.models.Product.definition.properties).to.have.property('version');
       expect(app.models.Product.definition.properties).to.have.property('versionHash');
@@ -271,7 +273,7 @@ describe('#loopback-allowed-properties-mixin', () => {
     });
 
     it('custom min setup', () => {
-      
+
       const app = getApp({
         hashFieldName:    false,
         actionFieldName:  false,
@@ -348,7 +350,7 @@ describe('#loopback-allowed-properties-mixin', () => {
         .map((action) => {
 
           it(action.name, p(() => {
-            
+
             const app = getAppSection();
 
             const data = {
@@ -358,7 +360,7 @@ describe('#loopback-allowed-properties-mixin', () => {
             };
 
             const V1 = ChangesHistoryMixin.getVersion(ChangesHistoryMixin.DEFAULT_OPTS.versionFieldLen, 1);
-            
+
             return action.callback(app, data)
             .then((record) => {
               // Properties
@@ -379,7 +381,7 @@ describe('#loopback-allowed-properties-mixin', () => {
 
               return record.history.find({})
               .then((changes) => {
-                
+
                 // Cantidad de elementos
                 expect(changes.length).to.equal(1);
 
@@ -441,7 +443,6 @@ describe('#loopback-allowed-properties-mixin', () => {
         });
 
       });
-
 
       const updateActions = [
         {
