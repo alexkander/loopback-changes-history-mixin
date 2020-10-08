@@ -1,5 +1,3 @@
-'use strict';
-
 const ChangeHistory = require('./changes-history');
 
 module.exports = function (app) {

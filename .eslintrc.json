@@ -1,0 +1,28 @@
+{
+  "env": {
+    "commonjs": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": ["airbnb-base", "plugin:node/recommended", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error", {"singleQuote": true}],
+    "no-unused-vars": "off",
+    "no-console": "off",
+    "func-names": "off",
+    "object-shorthand": "off",
+    "max-len": "off",
+    "no-param-reassign": "off",
+    "consistent-return": "off",
+    "no-restricted-syntax": "off",
+    "no-await-in-loop": "off",
+    "array-callback-return": "off",
+    "no-underscore-dangle": "off",
+    "no-plusplus": "off",
+    "no-multi-assign": "off",
+    "global-require": "off",
+    "import/no-dynamic-require": "off",
+    "default-case": "off"
+  }
+}
