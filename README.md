@@ -43,7 +43,7 @@ Add mixin params in model definition. Example:
     "description": "string"
   },
   "mixins": {
-    "ChangeHistory": true
+    "ChangesHistory": true
   }
 }
 ```
